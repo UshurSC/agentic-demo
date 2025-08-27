@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circle Health</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Carousel image should always show full image */
+    #hero-slider img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+      background: #000;
+    }
+
+    .hero-preview-item {
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .hero-preview-item.active-preview {
+      border-color: #fff;
+      transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+    }
+
+    .hero-preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 0.25rem;
+    }
+
+    .modal-overlay {
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    .modal-container {
+      transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    }
+
+    .modal-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .modal-hidden .modal-container {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100">
+
+  <!-- Carousel (no overlay, full image shown) -->
+  <section id="hero-slider-container" class="relative text-white overflow-hidden bg-black">
+    <div id="hero-slider" class="relative w-full">
+      <!-- Images injected here -->
+    </div>
+    <div id="hero-preview-nav"
+      class="hero-preview-nav absolute right-0 top-1/2 transform -translate-y-1/2 z-30 p-4 space-y-2 hidden md:flex flex-col items-center">
+    </div>
+  </section>
+
+  <!-- Sections below carousel -->
+  <section class="bg-blue-600 text-white py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:text-left">
+        <div
+          class="flex items-center justify-center md:justify-start space-x-3 p-3 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
+          <p class="text-2xl font-thin">Learn more about our plans</p><i class="fas fa-circle-chevron-right text-4xl"></i>
+        </div>
+        <div
+          class="flex items-center justify-center md:justify-start space-x-3 p-3 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
+          <p class="text-2xl font-thin">Pay my Circle Care Premium</p><i class="fas fa-circle-chevron-right text-4xl"></i>
+        </div>
+        <div
+          class="flex items-center justify-center md:justify-start space-x-3 p-3 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
+          <p class="text-2xl font-thin">Submit or check status of a claim</p><i class="fas fa-circle-chevron-right text-4xl"></i>
+        </div>
+        <div
+          class="flex items-center justify-center md:justify-start space-x-3 p-3 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
+          <p class="text-2xl font-thin">Find care within Circle Care</p><i class="fas fa-circle-chevron-right text-4xl"></i>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white py-16 lg:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">Get to know Circle Health</h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">When it comes to keeping our community healthy, we show up with
+        our whole hearts.</p>
+    </div>
+    <img src="https://cdn.ushur.com/website/images/circle-below.jpeg"
+      alt="Informational image about Circle Health services"
+      style="width: 100%; max-width: 1200px; border-radius: 24px; margin: 2rem auto 0 auto; display: block;" />
+  </section>
+
+  <!-- Chatbot button -->
+  <button id="open-chatbot-modal-button"
+    class="fixed bottom-6 left-6 bg-teal-500 hover:bg-teal-600 text-white p-5 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-opacity-75 transition-transform transform hover:scale-110 z-50">
+    <i class="fas fa-code text-3xl"></i>
+    <span class="sr-only">Add Chatbot Snippet</span>
+  </button>
+
+  <!-- Chatbot modal -->
+  <div id="chatbot-modal"
+    class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 modal-overlay modal-hidden z-[60]">
+    <div class="bg-white p-6 sm:p-8 rounded-lg shadow-xl w-full max-w-lg modal-container">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-semibold text-gray-800">Add Chatbot Snippet</h3>
+        <button id="close-chatbot-modal-button" class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times text-2xl"></i><span class="sr-only">Close modal</span>
+        </button>
+      </div>
+      <div>
+        <label for="chatbot-snippet" class="block text-sm font-medium text-gray-700 mb-2">Paste your chatbot
+          JavaScript snippet (can include &lt;script&gt; tags):</label>
+        <textarea id="chatbot-snippet" name="chatbot-snippet" rows="6"
+          class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-sm"
+          placeholder="e.g., <script src='...'></script> or yourFunction();"></textarea>
+      </div>
+      <div class="mt-6 flex justify-end space-x-3">
+        <button id="cancel-chatbot-button" type="button"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md border border-gray-300 shadow-sm">Cancel</button>
+        <button id="apply-chatbot-snippet-button" type="button"
+          class="px-4 py-2 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-md shadow-sm">Apply
+          Snippet</button>
+      </div>
+      <p id="snippet-status" class="mt-4 text-sm text-green-600"></p>
+    </div>
+  </div>
+
+  <script>
+    // Chatbot Modal Logic
+    const openModalButton = document.getElementById('open-chatbot-modal-button');
+    const closeModalButton = document.getElementById('close-chatbot-modal-button');
+    const cancelModalButton = document.getElementById('cancel-chatbot-button');
+    const chatbotModal = document.getElementById('chatbot-modal');
+    const applySnippetButton = document.getElementById('apply-chatbot-snippet-button');
+    const chatbotSnippetTextarea = document.getElementById('chatbot-snippet');
+    const snippetStatus = document.getElementById('snippet-status');
+
+    function showChatbotModal() { chatbotModal.classList.remove('modal-hidden'); snippetStatus.textContent = ''; }
+    function hideChatbotModal() { chatbotModal.classList.add('modal-hidden'); }
+
+    openModalButton.addEventListener('click', showChatbotModal);
+    closeModalButton.addEventListener('click', hideChatbotModal);
+    cancelModalButton.addEventListener('click', hideChatbotModal);
+    chatbotModal.addEventListener('click', (event) => { if (event.target === chatbotModal) hideChatbotModal(); });
+
+    applySnippetButton.addEventListener('click', () => {
+      const snippetText = chatbotSnippetTextarea.value.trim();
+      snippetStatus.textContent = '';
+      if (snippetText) {
+        try {
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = snippetText;
+          Array.from(tempDiv.childNodes).forEach(node => {
+            if (node.tagName === 'SCRIPT') {
+              const scriptElement = document.createElement('script');
+              for (let i = 0; i < node.attributes.length; i++) {
+                const attr = node.attributes[i];
+                scriptElement.setAttribute(attr.name, attr.value);
+              }
+              if (node.innerHTML) {
+                scriptElement.innerHTML = node.innerHTML;
+              }
+              document.body.appendChild(scriptElement);
+            }
+          });
+          snippetStatus.textContent = 'Chatbot snippet applied successfully!';
+          snippetStatus.classList.add('text-green-600');
+
+          setTimeout(() => {
+                            chatbotSnippetTextarea.value = '';
+                            hideChatbotModal();
+                        }, 1500);
+        } catch (error) {
+          snippetStatus.textContent = 'Error applying snippet.';
+          snippetStatus.classList.add('text-red-600');
+        }
+      } else {
+        snippetStatus.textContent = 'Snippet cannot be empty.';
+        snippetStatus.classList.add('text-red-600');
+      }
+    });
+
+    // Hero Slider Logic (always show full image, no auto-loop)
+    const slidesData = [
+      {
+        id: 1,
+        image: 'https://demo.ushur.io/u/FpeZFd',
+        previewImage: 'https://demo.ushur.io/u/FpeZFd'
+      },
+    //   {
+    //     id: 2,
+    //     image: 'https://cdn.ushur.com/website/images/circle-hero-2.png',
+    //     previewImage: 'https://cdn.ushur.com/website/images/circle-hero-2.png'
+    //   }
+    ];
+
+    const heroSlider = document.getElementById('hero-slider');
+    const heroPreviewNav = document.getElementById('hero-preview-nav');
+    let currentSlideIndex = 0;
+
+    function updateSlide(index) {
+      const imgs = heroSlider.querySelectorAll("img");
+      imgs.forEach((img, i) => {
+        img.classList.toggle("hidden", i !== index);
+      });
+      const previewItems = heroPreviewNav.querySelectorAll('.hero-preview-item');
+      previewItems.forEach((item, i) => item.classList.toggle('active-preview', i === index));
+    }
+
+    function createSliderImages() {
+      heroSlider.innerHTML = '';
+      slidesData.forEach((slide, index) => {
+        const img = document.createElement('img');
+        img.src = slide.image;
+        img.alt = `Slide ${slide.id}`;
+        img.className = `${index !== 0 ? 'hidden' : ''}`;
+        heroSlider.appendChild(img);
+      });
+    }
+
+    function createPreviewItems() {
+      heroPreviewNav.innerHTML = '';
+      slidesData.forEach((slide, index) => {
+        const previewItem = document.createElement('div');
+        previewItem.classList.add('hero-preview-item', 'w-24', 'h-16', 'mb-2', 'rounded-md', 'overflow-hidden', 'shadow-md');
+        previewItem.innerHTML = `<img src="${slide.previewImage}" alt="Slide ${slide.id} preview">`;
+        previewItem.addEventListener('click', () => {
+          currentSlideIndex = index;
+          updateSlide(currentSlideIndex);
+        });
+        heroPreviewNav.appendChild(previewItem);
+      });
+    }
+
+    createSliderImages();
+    createPreviewItems();
+    updateSlide(currentSlideIndex);
+  </script>
+
+</body>
+</html>
