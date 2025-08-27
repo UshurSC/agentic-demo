@@ -1,0 +1,510 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circle Health</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Hero Slider Styles */
+        .hero-slide {
+            background-size: cover;
+            background-position: center;
+            transition: opacity 0.7s ease-in-out, background-image 0.7s ease-in-out;
+        }
+
+        .hero-slide-content {
+            transition: opacity 0.5s ease-in-out 0.2s, transform 0.5s ease-in-out 0.2s;
+        }
+
+        .hero-slide.hidden-slide .hero-slide-content {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .hero-slide:not(.hidden-slide) .hero-slide-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom gradient for the hero section overlay */
+        .hero-overlay {
+            background: linear-gradient(to right, rgba(0, 101, 106, 0.95) 0%, rgba(0, 101, 106, 0.85) 40%, rgba(0, 101, 106, 0.1) 100%);
+        }
+
+        @media (max-width: 768px) {
+            .hero-overlay {
+                background: linear-gradient(to bottom, rgba(0, 101, 106, 0.95) 0%, rgba(0, 101, 106, 0.85) 60%, rgba(0, 101, 106, 0.1) 100%);
+            }
+
+            .hero-preview-nav {
+                position: static !important;
+                flex-direction: row !important;
+                justify-content: center !important;
+                margin-top: 1rem;
+                padding: 0.5rem;
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 0.5rem;
+            }
+
+            .hero-preview-item {
+                width: 60px !important;
+                height: 40px !important;
+                margin: 0 0.25rem !important;
+            }
+
+            .hero-slide {
+                min-height: 60vh;
+            }
+        }
+
+        .hero-preview-item {
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .hero-preview-item.active-preview {
+            border-color: #fff;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+        }
+
+        .hero-preview-item:not(.active-preview):hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .hero-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0.25rem;
+        }
+
+        /* Styles for the chatbot snippet modal */
+        .modal-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .modal-container {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+
+        .modal-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .modal-hidden .modal-container {
+            transform: scale(0.95);
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+
+    <header class="bg-white shadow-md sticky top-0 z-40">
+        <div class="bg-gray-50 py-1 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto flex justify-between items-center text-xs text-gray-600">
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="hover:text-teal-600 flex items-center">
+                        <i class="fas fa-globe mr-1"></i> Language (EN) <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="#" class="hover:text-teal-600">Careers</a>
+                    <a href="#" class="hover:text-teal-600">Providers</a>
+                    <a href="#" class="hover:text-teal-600">Brokers</a>
+                </div>
+            </div>
+        </div>
+
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="#" class="text-3xl font-bold text-teal-600">circle</a>
+                </div>
+                <div class="hidden lg:flex items-center space-x-6 text-sm font-medium text-gray-700">
+                    <a href="#" class="hover:text-teal-600">Browse Plans <i
+                            class="fas fa-chevron-down ml-1 text-xs"></i></a>
+                    <a href="#" class="hover:text-teal-600">Learning Center <i
+                            class="fas fa-chevron-down ml-1 text-xs"></i></a>
+                    <a href="#" class="hover:text-teal-600">Community Resources <i
+                            class="fas fa-chevron-down ml-1 text-xs"></i></a>
+                    <a href="#" class="hover:text-teal-600">Find a doctor</a>
+                    <a href="#" class="hover:text-teal-600">Chat with us</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="text-gray-600 hover:text-teal-600">
+                        <i class="fas fa-search"></i><span class="sr-only">Search</span>
+                    </button>
+                    <a href="#"
+                        class="px-4 py-2 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-md shadow-sm">Login</a>
+                    <div class="lg:hidden">
+                        <button id="mobile-menu-button" class="text-gray-600 hover:text-teal-600 focus:outline-none">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div id="mobile-menu" class="lg:hidden hidden bg-white border-t border-gray-200">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50">Browse
+                    Plans <i class="fas fa-chevron-down ml-1 text-xs"></i></a>
+                <a href="#"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50">Learning
+                    Center <i class="fas fa-chevron-down ml-1 text-xs"></i></a>
+                <a href="#"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50">Community
+                    Resources <i class="fas fa-chevron-down ml-1 text-xs"></i></a>
+                <a href="#"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50">Find
+                    a doctor</a>
+                <a href="#"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50">Chat
+                    with us</a>
+                <hr class="my-2">
+                <a href="#"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50">Careers</a>
+                <a href="#"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50">Providers</a>
+                <a href="#"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50">Brokers</a>
+            </div>
+        </div>
+    </header>
+
+    <section id="hero-slider-container" class="relative text-white overflow-hidden">
+        <div id="hero-slider" class="hero-slide">
+            <div class="absolute inset-0 hero-overlay z-10"></div>
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 lg:py-48 z-20">
+                <div class="w-full md:w-3/5 lg:w-1/2 hero-slide-content">
+                    <h1 id="hero-headline" class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
+                        {/* Headline will be injected by JS */}
+                    </h1>
+                    <p id="hero-subtext" class="mt-6 text-lg sm:text-xl text-gray-200 max-w-xl">
+                        {/* Subtext will be injected by JS */}
+                    </p>
+                    <div class="mt-10">
+                        <a id="hero-cta" href="#"
+                            class="inline-block bg-white text-teal-600 hover:bg-gray-100 text-lg font-semibold px-8 py-4 rounded-md shadow-lg transition duration-150 ease-in-out">
+                            {/* CTA text will be injected by JS */}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="hero-preview-nav"
+            class="hero-preview-nav absolute right-0 top-1/2 transform -translate-y-1/2 z-30 p-4 space-y-2 hidden md:flex flex-col items-center">
+            {/* Preview items will be injected by JS */}
+        </div>
+    </section>
+
+
+    <section class="bg-blue-600 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:text-left">
+                <div
+                    class="flex items-center justify-center md:justify-start space-x-3 p-3 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
+                    <p class="text-2xl font-thin">Learn more about our plans</p><i
+                        class="fas fa-circle-chevron-right text-4xl"></i>
+                </div>
+                <div
+                    class="flex items-center justify-center md:justify-start space-x-3 p-3 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
+                    <p class="text-2xl font-thin">Pay my Circle Care Premium</p><i
+                        class="fas fa-circle-chevron-right text-4xl"></i>
+                </div>
+                <div
+                    class="flex items-center justify-center md:justify-start space-x-3 p-3 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
+                    <p class="text-2xl font-thin">Submit or check status of a claim</p><i
+                        class="fas fa-circle-chevron-right text-4xl"></i>
+                </div>
+                <div
+                    class="flex items-center justify-center md:justify-start space-x-3 p-3 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
+                    <p class="text-2xl font-thin">Find care within Circle Care</p><i
+                        class="fas fa-circle-chevron-right text-4xl"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-white py-16 lg:py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">Get to know Circle Health</h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">When it comes to keeping our community healthy, we show
+                up with our whole hearts.</p>
+        </div>
+        <img src="https://cdn.ushur.com/website/images/circle-below.jpeg"
+            alt="Informational image about Circle Health services"
+            style="width: 100%; max-width: 1200px; border-radius: 24px; margin: 2rem auto 0 auto; display: block;" />
+    </section>
+
+    <button id="open-chatbot-modal-button"
+        class="fixed bottom-6 left-6 bg-teal-500 hover:bg-teal-600 text-white p-5 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-opacity-75 transition-transform transform hover:scale-110 z-50">
+        <i class="fas fa-code text-3xl"></i>
+        <span class="sr-only">Add Chatbot Snippet</span>
+    </button>
+
+    <div id="chatbot-modal"
+        class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 modal-overlay modal-hidden z-[60]">
+        <div class="bg-white p-6 sm:p-8 rounded-lg shadow-xl w-full max-w-lg modal-container">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-semibold text-gray-800">Add Chatbot Snippet</h3>
+                <button id="close-chatbot-modal-button" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-2xl"></i><span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <div>
+                <label for="chatbot-snippet" class="block text-sm font-medium text-gray-700 mb-2">Paste your chatbot
+                    JavaScript snippet (can include &lt;script&gt; tags):</label>
+                <textarea id="chatbot-snippet" name="chatbot-snippet" rows="6"
+                    class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-sm"
+                    placeholder="e.g., <script src='...'></script> or yourFunction();"></textarea>
+            </div>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button id="cancel-chatbot-button" type="button"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md border border-gray-300 shadow-sm">Cancel</button>
+                <button id="apply-chatbot-snippet-button" type="button"
+                    class="px-4 py-2 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-md shadow-sm">Apply
+                    Snippet</button>
+            </div>
+            <p id="snippet-status" class="mt-4 text-sm text-green-600"></p>
+        </div>
+    </div>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            document.addEventListener('click', (event) => {
+                if (!mobileMenuButton.contains(event.target) && !mobileMenu.contains(event.target) && !mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        }
+
+        // Chatbot Modal Logic
+        const openModalButton = document.getElementById('open-chatbot-modal-button');
+        const closeModalButton = document.getElementById('close-chatbot-modal-button');
+        const cancelModalButton = document.getElementById('cancel-chatbot-button');
+        const chatbotModal = document.getElementById('chatbot-modal');
+        const applySnippetButton = document.getElementById('apply-chatbot-snippet-button');
+        const chatbotSnippetTextarea = document.getElementById('chatbot-snippet');
+        const snippetStatus = document.getElementById('snippet-status');
+
+        function showChatbotModal() { if (chatbotModal) chatbotModal.classList.remove('modal-hidden'); snippetStatus.textContent = ''; }
+        function hideChatbotModal() { if (chatbotModal) chatbotModal.classList.add('modal-hidden'); }
+
+        if (openModalButton) openModalButton.addEventListener('click', showChatbotModal);
+        if (closeModalButton) closeModalButton.addEventListener('click', hideChatbotModal);
+        if (cancelModalButton) cancelModalButton.addEventListener('click', hideChatbotModal);
+        if (chatbotModal) chatbotModal.addEventListener('click', (event) => { if (event.target === chatbotModal) hideChatbotModal(); });
+
+        if (applySnippetButton && chatbotSnippetTextarea) {
+            applySnippetButton.addEventListener('click', () => {
+                const snippetText = chatbotSnippetTextarea.value.trim();
+                snippetStatus.textContent = '';
+
+                if (snippetText) {
+                    try {
+                        const lowerSnippet = snippetText.toLowerCase();
+                        // Check if '<script' is present and if '<\/script>' is present after it.
+                        const openTagIndex = lowerSnippet.indexOf('<script');
+                        const closeTagIndex = lowerSnippet.indexOf('<\/script>'); // Keep escaped for safety in string literal
+                        const hasScriptTags = openTagIndex !== -1 && closeTagIndex !== -1 && closeTagIndex > openTagIndex;
+
+                        if (hasScriptTags) {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = snippetText;
+                            Array.from(tempDiv.childNodes).forEach(node => {
+                                if (node.tagName === 'SCRIPT') {
+                                    const scriptElement = document.createElement('script');
+                                    for (let i = 0; i < node.attributes.length; i++) {
+                                        const attr = node.attributes[i];
+                                        scriptElement.setAttribute(attr.name, attr.value);
+                                    }
+                                    if (node.innerHTML) {
+                                        scriptElement.innerHTML = node.innerHTML;
+                                    }
+                                    document.body.appendChild(scriptElement);
+                                }
+                            });
+                        } else {
+                            const scriptElement = document.createElement('script');
+                            scriptElement.textContent = snippetText;
+                            document.body.appendChild(scriptElement);
+                        }
+
+                        snippetStatus.textContent = 'Chatbot snippet applied successfully!';
+                        snippetStatus.classList.remove('text-red-600');
+                        snippetStatus.classList.add('text-green-600');
+
+                        setTimeout(() => {
+                            chatbotSnippetTextarea.value = '';
+                            hideChatbotModal();
+                        }, 1500);
+
+                    } catch (error) {
+                        console.error("Error applying snippet:", error);
+                        snippetStatus.textContent = 'Error applying snippet. Check console for details.';
+                        snippetStatus.classList.remove('text-green-600');
+                        snippetStatus.classList.add('text-red-600');
+                    }
+                } else {
+                    snippetStatus.textContent = 'Snippet cannot be empty.';
+                    snippetStatus.classList.remove('text-green-600');
+                    snippetStatus.classList.add('text-red-600');
+                }
+            });
+        }
+
+        // Hero Slider Logic
+        const slidesData = [
+            {
+                id: 1,
+                image: 'https://cdn.ushur.com/website/images/circle-hero-1.jpg',
+                previewImage: 'https://cdn.ushur.com/website/images/circle-hero-1.jpg',
+                headline: "Ensure Your Child's Health with Circle Care",
+                subtext: "Welcome to Circle Health, Inc., your trusted partner in ensuring your child's health and well-being through comprehensive Circle Medicaid Services.",
+                ctaText: "Schedule a wellness visit",
+                ctaLink: "#"
+            },
+            {
+                id: 2,
+                image: 'https://cdn.ushur.com/website/images/circle-hero-2.png',
+                previewImage: 'https://cdn.ushur.com/website/images/circle-hero-2.png',
+                headline: "Discover Our Comprehensive Family Plans",
+                subtext: "Explore a range of health plans designed to meet the unique needs of your family, offering peace of mind and extensive coverage for all.",
+                ctaText: "Explore Plans",
+                ctaLink: "#"
+            }
+        ];
+
+        const heroSlider = document.getElementById('hero-slider');
+        const heroHeadline = document.getElementById('hero-headline');
+        const heroSubtext = document.getElementById('hero-subtext');
+        const heroCta = document.getElementById('hero-cta');
+        const heroPreviewNav = document.getElementById('hero-preview-nav');
+
+        let currentSlideIndex = 0;
+        let slideInterval;
+
+        function updateSlide(index) {
+            if (!slidesData || slidesData.length === 0 || index < 0 || index >= slidesData.length) {
+                console.error("Slides data is missing or index is out of bounds.");
+                if (heroSlider) heroSlider.style.backgroundImage = "url('https://placehold.co/1200x800/CCCCCC/FFFFFF?text=Error+Loading+Slide&font=Inter')";
+                return;
+            }
+            const slide = slidesData[index];
+            if (!heroSlider || !slide) return;
+
+            heroSlider.classList.add('hidden-slide');
+
+            setTimeout(() => {
+                heroSlider.style.backgroundImage = `url('${slide.image}')`;
+                if (heroHeadline) heroHeadline.innerHTML = slide.headline.replace("Circle Care", "<span class='text-green-300'>Circle Care</span>");
+                if (heroSubtext) heroSubtext.textContent = slide.subtext;
+                if (heroCta) {
+                    heroCta.textContent = slide.ctaText;
+                    heroCta.href = slide.ctaLink;
+                }
+                heroSlider.classList.remove('hidden-slide');
+
+                const previewItems = heroPreviewNav.querySelectorAll('.hero-preview-item');
+                previewItems.forEach((item, i) => {
+                    item.classList.toggle('active-preview', i === index);
+                });
+            }, 350);
+        }
+
+        function nextSlide() {
+            currentSlideIndex = (currentSlideIndex + 1) % slidesData.length;
+            updateSlide(currentSlideIndex);
+        }
+
+        function createPreviewItems() {
+            if (!heroPreviewNav) return;
+            heroPreviewNav.innerHTML = '';
+            slidesData.forEach((slide, index) => {
+                const previewItem = document.createElement('div');
+                previewItem.classList.add('hero-preview-item', 'w-24', 'h-16', 'mb-2', 'rounded-md', 'overflow-hidden', 'shadow-md');
+                if (window.innerWidth < 768) {
+                    previewItem.classList.remove('w-24', 'h-16', 'mb-2');
+                    previewItem.classList.add('w-16', 'h-10', 'mx-1');
+                }
+                previewItem.innerHTML = `<img src="${slide.previewImage}" alt="Slide ${slide.id} preview" class="w-full h-full object-cover">`;
+                previewItem.addEventListener('click', () => {
+                    currentSlideIndex = index;
+                    updateSlide(currentSlideIndex);
+                    resetSlideInterval();
+                });
+                heroPreviewNav.appendChild(previewItem);
+            });
+        }
+
+        function startSlideShow() {
+            clearInterval(slideInterval);
+            if (slidesData.length > 0) {
+                slideInterval = setInterval(nextSlide, 5000);
+            }
+        }
+
+        function resetSlideInterval() {
+            clearInterval(slideInterval);
+            startSlideShow();
+        }
+
+        if (heroSlider && heroPreviewNav && slidesData && slidesData.length > 0) {
+            createPreviewItems();
+            updateSlide(currentSlideIndex);
+            startSlideShow();
+        } else if (slidesData && slidesData.length === 0) {
+            console.warn("Hero slider initialized with no slides.");
+            if (heroSlider) {
+                heroSlider.style.backgroundImage = "url('https://placehold.co/1200x800/EEEEEE/777777?text=No+Slides+Available&font=Inter')";
+            }
+            if (heroHeadline) {
+                heroHeadline.textContent = "Content Coming Soon";
+            }
+            if (heroSubtext) {
+                heroSubtext.textContent = "Please check back later for updates.";
+            }
+            if (heroCta) {
+                heroCta.style.display = 'none';
+            }
+            if (heroPreviewNav) {
+                heroPreviewNav.innerHTML = '';
+            }
+        }
+
+        let lastWindowWidth = window.innerWidth;
+        window.addEventListener('resize', () => {
+            if (Math.abs(window.innerWidth - lastWindowWidth) > 50) {
+                if (heroPreviewNav && slidesData.length > 0) createPreviewItems();
+                if (slidesData.length > 0) updateSlide(currentSlideIndex);
+                lastWindowWidth = window.innerWidth;
+            }
+        });
+
+    </script>
+
+</body>
+
+</html>
